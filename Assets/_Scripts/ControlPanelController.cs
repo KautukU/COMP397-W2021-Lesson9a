@@ -15,7 +15,14 @@ public class ControlPanelController : MonoBehaviour
     public float timer = 0.0f;
     public bool isOnScreen = false;
 
+    [Header("Player Settings")]
+    public PlayerBehaviour player;
     public CameraController playerCamera;
+
+    [Header("Scene Data")]
+    public ScreenDataSO sceneData;
+
+    public GameObject gameStateLabel;
 
     public Pauseable pausable;
 
@@ -23,6 +30,7 @@ public class ControlPanelController : MonoBehaviour
     void Start()
     {
         pausable = FindObjectOfType<Pauseable>();
+        player = FindObjectOfType<PlayerBehaviour>();
         playerCamera = FindObjectOfType<CameraController>();
         rectTransform = GetComponent<RectTransform>();
         rectTransform.anchoredPosition = offScreenPosition;
@@ -32,10 +40,10 @@ public class ControlPanelController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (Input.GetKeyDown(KeyCode.Tab))
-        {
-            ToggleControlPanel();
-        }
+        //if (Input.GetKeyDown(KeyCode.Tab))
+        //{
+        //    ToggleControlPanel();
+        //}
 
         if (isOnScreen)
         {
@@ -45,6 +53,8 @@ public class ControlPanelController : MonoBehaviour
         {
             MoveControlPanelUp();
         }
+
+        gameStateLabel.SetActive(pausable.isGamePaused);
     }
 
     void ToggleControlPanel()
@@ -91,6 +101,22 @@ public class ControlPanelController : MonoBehaviour
     public void OnControlButtonPressed()
     {
         ToggleControlPanel();
+    }
+
+    public void OnLoadButtonPressed()
+    {
+        player.controller.enabled = false;
+        player.transform.position = sceneData.playerPosition;
+        player.controller.enabled = true;
+
+        player.health = sceneData.playerHealth;
+        player.healthBar.SetHealth(sceneData.playerHealth);
+    }
+
+    public void OnSaveButtonPressed()
+    {
+        sceneData.playerPosition = player.transform.position;
+        sceneData.playerHealth = player.health;
     }
 
 }
